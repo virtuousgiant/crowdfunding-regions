@@ -141,7 +141,7 @@ class Astoundify_Crowdfunding_Regions {
 
 		if ( $atts[ 'editing' ] || $atts[ 'previewing' ] ) {
 			$regions  = get_the_terms( $campaign->ID, 'campaign_region' );
-			$selected = current( array_keys( $regions ) );
+			$selected = is_array( $regions ) ? current( array_keys( $regions ) ) : 0;
 		}
 	?>
 			<p class="atcf-submit-campaign-region">
