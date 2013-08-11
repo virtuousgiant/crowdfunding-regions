@@ -11,11 +11,11 @@ Stable Tag: 1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Add predefined regions with campaign archives for Crowdfunding by Astounidfy.
+Add predefined regions with campaign archives for Crowdfunding by Astoundify.
 
 == Description ==
 
-Add predefined regions with campaign archives for Crowdfunding by Astounidfy.
+Add predefined regions with campaign archives for Crowdfunding by Astoundify.
 
 = Premium Themes =
 
