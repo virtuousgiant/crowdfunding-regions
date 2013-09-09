@@ -68,14 +68,14 @@ class Astoundify_Crowdfunding_Regions {
 	 * @return void
 	 */
 	private function setup_actions() {
-		add_action( 'init', array( $this, 'register_post_taxonomy' ) );
-		add_action( 'atcf_shortcode_submit_fields', array( $this, 'shortcode_submit_fields' ), 125, 2 );
-		add_action( 'atcf_submit_process_after', array( $this, 'submit_process_after' ), 10, 3 );
+		add_action( 'init', array( $this, 'register_post_taxonomy' ), 0 );
+		
+		add_filter( 'atcf_shortcode_submit_fields', array( $this, 'shortcode_submit_fields' ) );
+		add_action( 'atcf_submit_process_after', array( $this, 'submit_process_after' ), 10, 4 );
+		add_filter( 'atcf_shortcode_submit_saved_data_region', array( $this, 'saved_data_region' ), 10, 3 );
+		
 		add_action( 'template_redirect', array( $this, 'template_loader' ) );
 
-		if ( true == apply_filters( 'acr_hide_location_field', false ) )
-			remove_action( 'atcf_shortcode_submit_fields', 'atcf_shortcode_submit_field_location', 120, 2 );
-		
 		$this->load_textdomain();
 	}
 
@@ -131,32 +131,36 @@ class Astoundify_Crowdfunding_Regions {
 	 *
 	 * @since Crowdfunding by Astoundify - Predefined Regions 1.0
 	 */
-	function shortcode_submit_fields( $atts, $campaign ) {
+	function shortcode_submit_fields( $fields ) {
 		$regions = get_terms( 'campaign_region', array( 'hide_empty' => 0 ) );
 
 		if ( ! atcf_theme_supports( 'campaign-regions' ) || empty( $regions ) )
 			return;
 
-		$selected = 0;
+		$fields[ 'region' ] = array(
+			'label'       => __( 'Region', 'acr' ),
+			'default'     => null,
+			'type'        => 'select',
+			'options'     => acr_get_regions_simple(),
+			'editable'    => true,
+			'required'    => false,
+			'priority'    => 40
+		);
 
-		if ( $atts[ 'editing' ] || $atts[ 'previewing' ] ) {
-			$regions  = get_the_terms( $campaign->ID, 'campaign_region' );
-			$selected = is_array( $regions ) ? current( array_keys( $regions ) ) : 0;
-		}
-	?>
-			<p class="atcf-submit-campaign-region">
-				<label for="region"><?php echo apply_filters( 'atc_shortcode_submit_field_title', __( 'Region', 'acr' ) ); ?></label>			
-				<?php 
-					wp_dropdown_categories( array( 
-						'name'       => 'region',
-						'orderby'    => 'name', 
-						'hide_empty' => 0,
-						'taxonomy'   => 'campaign_region',
-						'selected'   => $selected
-					) );
-				?>
-			</p>
-	<?php
+		if ( true == apply_filters( 'acr_hide_location_field', false ) )
+			unset( $fields[ 'location' ] );
+
+		return $fields;
+	}
+
+	function saved_data_region( $data, $key, $campaign ) {
+		if ( ! isset ( $campaign ) )
+			return;
+
+		$regions  = get_the_terms( $campaign->ID, 'campaign_region' );
+		$selected = is_array( $regions ) ? current( array_keys( $regions ) ) : 0;
+
+		return $selected;
 	}
 
 	/**
@@ -164,10 +168,10 @@ class Astoundify_Crowdfunding_Regions {
 	 *
 	 * @since Crowdfunding by Astoundify - Predefined Regions 1.0
 	 */
-	function submit_process_after( $campaign, $data, $status ) {
-		$region = isset ( $_POST[ 'region' ] ) ? $_POST[ 'region' ] : null;
+	function submit_process_after( $campaign, $postdata, $status, $fields ) {
+		$region = isset ( $postdata[ 'region' ] ) ? $postdata[ 'region' ] : null;
 
-		wp_set_post_terms( $campaign, $region, 'campaign_region' );
+		wp_set_post_terms( $campaign, array( $region ), 'campaign_region' );
 	}
 
 	/**
@@ -200,9 +204,9 @@ class Astoundify_Crowdfunding_Regions {
 		$mofile_global = WP_LANG_DIR . '/' . $this->domain . '/' . $mofile;
 
 		if ( file_exists( $mofile_global ) ) {
-			return load_textdomain( $this->domain, $mofile_global );
+			return load_plugin_textdomain( $this->domain, false, $mofile_global );
 		} elseif ( file_exists( $mofile_local ) ) {
-			return load_textdomain( $this->domain, $mofile_local );
+			return load_plugin_textdomain( $this->domain, false, $mofile_local );
 		}
 
 		return false;
@@ -223,3 +227,30 @@ function acr() {
 }
 
 acr();
+
+/**
+ * Get regions (terms) helper.
+ *
+ * @since 1.0
+ */
+function acr_get_regions() {
+	$locations = get_terms( 'campaign_region', apply_filters( 'acr_get_region_args', array( 'hide_empty' => 0 ) ) );
+
+	return $locations;
+}
+
+/**
+ * Create a key => value pair of term ID and term name.
+ *
+ * @since 1.0
+ */
+function acr_get_regions_simple() {
+	$locations = acr_get_regions();
+	$simple    = array();
+
+	foreach ( $locations as $location ) {
+		$simple[ $location->term_id ] = $location->name;
+	}
+
+	return apply_filters( 'acr_get_regions_simple', $simple );
+}
