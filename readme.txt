@@ -7,7 +7,7 @@ Contributors: SpencerFinnell
 Tags: crowdfunding, regions, locations
 Requires at least: 3.5
 Tested up to: 3.5
-Stable Tag: 1.0
+Stable Tag: 1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,6 +31,10 @@ We currently have two compatible themes that have been released:
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 1.1: September 14, 2013 =
+
+* Fix: Compatible with versions 1.7+ of Crowdfunding by Astoundify
 
 = 1.0: August 4, 2013 =
 
