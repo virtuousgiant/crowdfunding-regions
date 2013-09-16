@@ -5,7 +5,7 @@
  * Description: Add predefined locations/regions to Crowdfunding by Astoundify plugin's submission form.
  * Author:      Astoundify
  * Author URI:  http://astoundify.com
- * Version:     1.0
+ * Version:     1.1
  * Text Domain: acr
  */
 
