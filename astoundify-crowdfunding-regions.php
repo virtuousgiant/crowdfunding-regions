@@ -134,8 +134,8 @@ class Astoundify_Crowdfunding_Regions {
 	function shortcode_submit_fields( $fields ) {
 		$regions = get_terms( 'campaign_region', array( 'hide_empty' => 0 ) );
 
-		if ( ! atcf_theme_supports( 'campaign-regions' ) || empty( $regions ) )
-			return $fields;
+		//if ( ! atcf_theme_supports( 'campaign-regions' ) || empty( $regions ) )
+		//	return $fields;
 
 		$fields[ 'region' ] = array(
 			'label'       => __( 'Region', 'acr' ),
